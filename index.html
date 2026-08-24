@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Refer a neighbour · delDSL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#171a17; --surface:#22261f; --line:#363b32; --ink:#eef2ec; --muted:#9aa39a;
+    --green:#19b466; --green-btn:#009846; --green-btn-d:#00762f; --tint:#123322; --tint-bd:#1e5233;
+    --input:#2a2f28; --input-line:#3c4239; --err:#ff6b5e;
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{font-family:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+       background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased; line-height:1.45}
+  .page{max-width:460px; margin:0 auto; min-height:100vh; background:var(--bg)}
+
+  .hero{position:relative; overflow:hidden; color:#fff; padding:22px 22px 24px;
+        background:linear-gradient(135deg,#23211f 0%,#0d5a30 100%)}
+  .hero img{height:34px; display:block}
+  .hero h1{font-size:26px; font-weight:800; letter-spacing:-.02em; margin:16px 0 8px}
+  .hero .reward{display:inline-block; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25);
+        color:#eafff2; font-size:13.5px; font-weight:700; padding:6px 12px; border-radius:999px}
+  .hero .reward b{color:#fff}
+  .hero .reward-note{margin:10px 0 0; font-size:12px; color:#bfe6cf; max-width:36ch}
+  .bars{position:absolute; right:16px; top:16px; display:flex; gap:5px; align-items:flex-end; height:50px; opacity:.9}
+  .bars i{width:9px; border-radius:3px; background:rgba(255,255,255,.5)}
+  .bars i:nth-child(1){height:30%} .bars i:nth-child(2){height:50%}
+  .bars i:nth-child(3){height:72%} .bars i:nth-child(4){height:100%; background:#fff}
+
+  .note{display:flex; gap:11px; align-items:flex-start; margin:16px 18px 4px;
+        background:var(--tint); border:1px solid var(--tint-bd); border-radius:13px; padding:13px 14px; font-size:13.5px; color:#c7ecd5}
+  .note svg{flex:0 0 auto; margin-top:1px}
+  .note b{color:#eafff2}
+
+  form{padding:14px 18px 26px}
+  .group{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 16px 6px; margin-bottom:14px}
+  .eyebrow{font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--green); margin:0 0 12px}
+  .known{font-size:14px; color:var(--ink); margin:0 0 6px} .known b{font-weight:700}
+  .field{margin-bottom:14px}
+  label{display:block; font-size:13.5px; font-weight:600; margin-bottom:6px; color:#d7ddd5}
+  .req{color:var(--green)}
+  input{width:100%; font:inherit; font-size:16px; color:var(--ink); padding:12px 13px;
+        border:1.5px solid var(--input-line); border-radius:11px; background:var(--input); transition:border-color .15s, box-shadow .15s}
+  input::placeholder{color:#79806f}
+  input:focus{outline:none; border-color:var(--green); box-shadow:0 0 0 3px rgba(25,180,102,.22)}
+  input[aria-invalid="true"]{border-color:var(--err); box-shadow:0 0 0 3px rgba(255,107,94,.18)}
+  .row{display:flex; gap:12px} .row .field{flex:1}
+  .prefix{position:relative} .prefix span{position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:16px; pointer-events:none}
+  .prefix input{padding-left:44px}
+  .error{display:none; color:var(--err); font-size:12.5px; margin-top:5px} .error.show{display:block}
+
+  .consent{display:flex; gap:11px; align-items:flex-start; background:var(--tint); border:1px solid var(--tint-bd); border-radius:12px; padding:13px 14px; margin-bottom:8px}
+  .consent input{width:20px; height:20px; margin:2px 0 0; accent-color:var(--green); flex:0 0 auto}
+  .consent label{font-weight:500; font-size:13.5px; margin:0; color:#c7ecd5}
+  #e-consent{margin:0 4px 14px}
+
+  button.submit{width:100%; font:inherit; font-weight:800; font-size:17px; color:#fff; cursor:pointer;
+    background:var(--green-btn); border:0; border-radius:13px; padding:15px; margin-top:10px; transition:background .15s, transform .06s}
+  button.submit:hover{background:var(--green-btn-d)} button.submit:active{transform:translateY(1px)}
+  button.submit:disabled{opacity:.6; cursor:default}
+  .foot{text-align:center; font-size:11.5px; color:var(--muted); padding:4px 24px 26px}
+
+  .done{display:none; padding:46px 26px; text-align:center} .done.show{display:block}
+  .check{width:74px; height:74px; margin:0 auto 18px; border-radius:50%; background:var(--tint); border:1px solid var(--tint-bd); display:grid; place-items:center}
+  .done h2{font-size:23px; font-weight:800; margin:0 0 8px} .done p{margin:0 auto 22px; color:var(--muted); font-size:15px; max-width:32ch}
+  .done b{color:var(--ink)}
+  .again{font:inherit; font-weight:700; font-size:15px; color:var(--green); background:none; border:1.5px solid var(--green); border-radius:11px; padding:11px 20px; cursor:pointer}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="bars"><i></i><i></i><i></i><i></i></div>
+    <img src="data:image/png;base64,[BASE64 LOGO DATA]" alt="delDSL">
+    <h1>Refer a neighbour</h1>
+    <span class="reward">You both get <b>one month's bill waived</b></span>
+    <p class="reward-note">Applies only once your neighbour is onboarded &mdash; a new connection installed and active.</p>
+  </div>
+
+  <div class="note">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#19b466" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5"/></svg>
+    <div>Please refer only people who live in <b id="bldg">your building</b>. delDSL is already live there, so we can get them online the fastest.</div>
+  </div>
+
+  <form id="ref-form" novalidate>
+    <div class="group">
+      <p class="eyebrow">You</p>
+      <div class="known" id="youKnown" hidden>Referring as <b id="youName"></b></div>
+    <div id="youAsk">
+
+  <div class="field">
+    <label for="rname">Your name <span class="req">*</span></label>
+    <input id="rname" type="text" placeholder="Your full name">
+    <div class="error" id="e-rname">Please enter your name.</div>
+  </div>
+
+  <div class="field">
+    <label for="racc">Your delDSL account ID or registered mobile number <span class="req">*</span></label>
+    <input id="racc" type="text" placeholder="So we can waive your bill">
+    <div class="error" id="e-racc">Please enter your account ID or mobile.</div>
+  </div>
+
+</div>
+    </div>
+
+    <div class="group">
+      <p class="eyebrow">Your neighbour</p>
+      <div class="field">
+        <label for="fname">Their name <span class="req">*</span></label>
+        <input id="fname" type="text" placeholder="Neighbour's name" required>
+        <div class="error" id="e-fname">Please enter their name.</div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="fflat">Flat / unit no. <span class="req">*</span></label>
+          <input id="fflat" type="text" placeholder="e.g. B-402" required>
+          <div class="error" id="e-fflat">Enter their flat number.</div>
+        </div>
+        <div class="field">
+          <label for="fmobile">Mobile <span class="req">*</span></label>
+          <div class="prefix"><span>+91</span>
+            <input id="fmobile" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit number" required>
+          </div>
+          <div class="error" id="e-fmobile">Enter a valid 10-digit number.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="consent">
+      <input id="consent" type="checkbox" required>
+      <label for="consent">My neighbour is happy for delDSL to contact them about this.</label>
+    </div>
+    <div class="error" id="e-consent">Please confirm their consent.</div>
+
+    <button class="submit" type="submit" id="submitBtn">Send referral</button>
+  </form>
+
+  <div class="done" id="done">
+    <div class="check"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#19b466" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+    <h2>Referral sent</h2>
+    <p>Thanks! We'll reach out to <b id="doneName">your neighbour</b> in <b id="doneBldg">your building</b>. Once they activate, delDSL waives a month's bill for both of you.</p>
+    <button class="again" id="againBtn" type="button">Refer someone else</button>
+  </div>
+
+  <p class="foot">delDSL &middot; Used only to process this referral.</p>
+</div>
+
+<script>
+  // ====== WHERE REFERRALS GO (no CRM needed) ==================================
+  // Easiest option: create a free form-to-email endpoint (e.g. Formspree, Web3Forms,
+  // Getform) and paste its URL below. Every referral then lands in your inbox.
+  // Leave it blank and the form falls back to opening a pre-filled email instead.
+  const FORM_ENDPOINT = "https://api.web3forms.com/submit";
+  const NOTIFY_EMAIL  = "suriyat@deldsl.com"; // fallback inbox for testing
+  // ===========================================================================
+
+  const p = new URLSearchParams(location.search);
+  const building = p.get('building');
+  if (building){ document.getElementById('bldg').textContent=building;
+                 document.getElementById('doneBldg').textContent=building; }
+  const ac = p.get('ac'), nm = p.get('name');
+  if (ac){ document.getElementById('youKnown').hidden=false;
+           document.getElementById('youAsk').hidden=true;
+           document.getElementById('youName').textContent = nm ? (nm+' \u00b7 '+ac) : ac; }
+
+  document.getElementById('fmobile').addEventListener('input',e=>e.target.value=e.target.value.replace(/\D/g,''));
+
+  const form=document.getElementById('ref-form'), btn=document.getElementById('submitBtn');
+  function setErr(id,show){const inp=document.getElementById(id.replace('e-',''));
+    document.getElementById(id).classList.toggle('show',show); if(inp) inp.setAttribute('aria-invalid',show?'true':'false');}
+  function validate(){
+    let ok=true;
+    if(!ac){
+  const rn = document.getElementById('rname').value.trim();
+  setErr('e-rname', !rn);
+  if(!rn) ok=false;
+
+  const r = document.getElementById('racc').value.trim();
+  setErr('e-racc', !r);
+  if(!r) ok=false;
+}
+
+const fn=document.getElementById('fname').value.trim(); setErr('e-fname',!fn); if(!fn)ok=false;
+    const ff=document.getElementById('fflat').value.trim(); setErr('e-fflat',!ff); if(!ff)ok=false;
+    const fm=document.getElementById('fmobile').value.trim(); const m=/^[6-9]\d{9}$/.test(fm); setErr('e-fmobile',!m); if(!m)ok=false;
+    const c=document.getElementById('consent').checked; setErr('e-consent',!c); if(!c)ok=false;
+    return ok;
+  }
+
+  async function submitReferral(payload){
+    if (FORM_ENDPOINT){
+      const res = await fetch(FORM_ENDPOINT,{method:'POST',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body: JSON.stringify(payload)});
+      if(!res.ok) throw new Error('failed');
+      return 'sent';
+    }
+    // Fallback: open a pre-filled email to delDSL (works with zero setup)
+    const subject = encodeURIComponent('New delDSL Neighbour Referral');
+    const bodyTxt = encodeURIComponent(
+      'Referrer Account / Mobile: ' + payload.referrer_account_or_mobile +
+      '\nReferrer Name: ' + payload.referrer_name +
+      '\nBuilding: ' + payload.building +
+      '\nNeighbour: ' + payload.neighbour_name + '  (Flat ' + payload.neighbour_flat + ')' +
+      '\nMobile: ' + payload.neighbour_mobile +
+      '\nConsent given: Yes' +
+      '\nSubmitted: ' + payload.submitted_at);
+    window.location.href = 'mailto:'+NOTIFY_EMAIL+'?subject='+subject+'&body='+bodyTxt;
+    return 'mailto';
+  }
+
+  form.addEventListener('submit', async e=>{
+    e.preventDefault(); if(!validate()) return;
+    btn.disabled=true; btn.textContent='Sending…';
+    const submittedAt = new Intl.DateTimeFormat('en-IN', {
+  timeZone: 'Asia/Kolkata',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false
+}).format(new Date()) + ' IST';
+    const referrerAccount = ac ? ac : document.getElementById('racc').value.trim();
+const referrerName = ac ? (nm || '') : document.getElementById('rname').value.trim();
+    const neighbourName = document.getElementById('fname').value.trim();
+    const neighbourFlat = document.getElementById('fflat').value.trim();
+    const neighbourMobile = document.getElementById('fmobile').value.trim();
+
+    const payload={
+      access_key: '25ca703d-e190-427d-a690-9362a3490c52',
+      subject: 'New delDSL Neighbour Referral',
+      from_name: 'delDSL Referral',
+      referrer_account_or_mobile: referrerAccount,
+      referrer_name: referrerName || '(not provided)', 
+      neighbour_name: neighbourName,
+      neighbour_flat: neighbourFlat,
+      neighbour_mobile: '+91 ' + neighbourMobile,
+      consent: 'Yes',
+      submitted_at: submittedAt
+    };
+    try{
+      await submitReferral(payload);
+      document.getElementById('doneName').textContent = payload.neighbour_name || 'your neighbour';
+      form.style.display='none'; document.getElementById('done').classList.add('show');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }catch(err){ btn.disabled=false; btn.textContent='Send referral';
+      alert('Something went wrong sending your referral. Please try again.'); }
+  });
+
+  document.getElementById('againBtn').addEventListener('click', ()=>{
+    form.reset(); form.style.display='block'; document.getElementById('done').classList.remove('show');
+    btn.disabled=false; btn.textContent='Send referral';
+  });
+</script>
+</body>
+</html>
